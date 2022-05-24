@@ -3,15 +3,28 @@ from math import degrees, radians, tan, atan, sin, cos, sqrt
 
 class Vector:
     def __init__(self, x=0, y=0, deg=None):
+        self._precision = 5
         self.x = x
         self.y = y
 
         if deg is not None:
             if deg != 90 and deg != 270:
-                self.x = 1
-                self.y = tan(radians(deg))
+                self.x = -1 if 90 < deg and deg < 270 else 1
+                self.y = tan(radians(deg)) * self.x
             else:
                 self.y = 1 if deg == 90 else -1
+
+        self.normalize()
+
+
+    def _simplify(self):
+        x = round(self.x, self._precision)
+        x_int = round(x)
+        self.x = x if x != x_int else x_int
+
+        y = round(self.y, self._precision)
+        y_int = round(y)
+        self.y = y if y != y_int else y_int
 
 
     def is_zero(self):
@@ -19,7 +32,11 @@ class Vector:
 
 
     def get_magnitude(self):
-        return sqrt(self.x ** 2 + self.y ** 2)
+        # L2 norm (Euclidean)
+        # return sqrt(self.x ** 2 + self.y ** 2)
+
+        # L_infty norm (Grid)
+        return max(abs(self.x), abs(self.y))
 
 
     def get_angle(self):
@@ -42,11 +59,17 @@ class Vector:
     def multiply(self, c):
         self.x *= c
         self.y *= c
+        self._simplify()
 
 
     def add(self, v):
         self.x += v.x
         self.y += v.y
+        self._simplify()
+
+
+    def normalize(self):
+        self.multiply(1 / self.get_magnitude())
 
 
     def rotate(self, deg):
@@ -56,14 +79,10 @@ class Vector:
         magnitude = self.get_magnitude()
         new_angle = self.get_angle() + radians(deg)
 
-        self.x = magnitude * cos(new_angle)
-        self.y = magnitude * sin(new_angle)
+        self.x = cos(new_angle)
+        self.y = sin(new_angle)
 
-
-    def baseify(self):
-        self.x = round(self.x)
-        self.y = round(self.y)
-
+        self.multiply(magnitude / self.get_magnitude())
 
 
     def output(self):
@@ -75,12 +94,11 @@ class Vector:
         print(s)
 
 
-# for x in range(-1, 2):
-#     for y in range(-1, 2):
-#         vector = Vector(x, y)
-#         vector.output()
-#         vector.rotate(45)
-#         vector.output()
-#         vector.baseify()
-#         vector.output()
-#         print()
+
+
+# for i in range(0, 8):
+#     vector = Vector(deg = i * 45)
+#     vector.output()
+#     vector.rotate(45)
+#     vector.output()
+#     print()
