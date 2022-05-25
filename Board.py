@@ -45,22 +45,22 @@ class Board:
         self._grid[x][y] = None
 
 
-    def scan(self, step, from_x, from_y):
-        point = Vector(from_x, from_y)
-        point.add(step)
+    def scan(self, position, direction):
+        step = Vector(deg = direction)
+        position.add(step)
 
-        distance = 0
+        distance = step.get_magnitude()
 
         while True:
-            if (not self.point_is_within_bounds(point.x, point.y)
-                or self.point_is_occupied(point.x, point.y)):
+            if (not self.point_is_within_bounds(position.x, position.y)
+                or self.point_is_occupied(position.x, position.y)):
                 return distance
 
-            point.add(step)
-            distance += 1
+            position.add(step)
+            distance += step.get_magnitude()
 
 
-    def draw(self):
+    def draw_simple(self):
         border = "@"
 
         print(border * (2 + self.width()))
@@ -70,7 +70,7 @@ class Board:
 
             for x in range(0, self.width()):
                 if self.point_is_occupied(x, y):
-                    line += str(self.read_point(x, y).id)
+                    line += str(self.read_point(x, y).to_str())
                 else:
                     line += " "
 
@@ -81,9 +81,71 @@ class Board:
         print(border * (2 + self.width()))
 
 
-        def debug(self):
+    def draw_detailed(self):
+        l_border = "@ "
+        r_border = " @"
+        cell_divider = " @ "
+        cell_width = 16
+        cell_height = 7
+
+        board_width = (len(l_border)
+            + len(r_border)
+            + self.width() * cell_width
+            + (self.width() - 1) * len(cell_divider))
+
+        horizontal_divider = "@"
+        while len(horizontal_divider) + len(r_border) <= board_width:
+            horizontal_divider += r_border
+
+        for y in range(self.height() - 1, -1, -1):
+            print(horizontal_divider)
+            lines = []
+            for i in range(0, cell_height):
+                lines.append(l_border)
+
             for x in range(0, self.width()):
-                for y in range(0, self.height()):
-                    point = self.read_point(x, y)
-                    id = "" if point is None else point.id
-                    print(f'({x}, {y}): {id}')
+                if x > 0:
+                    for i in range(0, len(lines)):
+                        lines[i] += cell_divider
+
+                if not self.point_is_occupied(x, y):
+                    for i in range(0, len(lines)):
+                        lines[i] += " " * cell_width
+                else:
+                    agent = self.read_point(x, y)
+                    agent_strings = agent.to_str(detailed=True)
+                    for i in range(0, len(lines)):
+                        lines[i] += agent_strings[i]
+
+            for l in lines:
+                print(l + r_border)
+
+        print(horizontal_divider)
+
+
+    def draw(self, detailed=True):
+        if detailed:
+            self.draw_detailed()
+        else:
+            self.draw_simple()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def debug(self):
+        for x in range(0, self.width()):
+            for y in range(0, self.height()):
+                point = self.read_point(x, y)
+                id = "" if point is None else point.id
+                print(f'({x}, {y}): {id}')

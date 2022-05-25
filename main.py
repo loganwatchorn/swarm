@@ -1,13 +1,15 @@
-from sys import stdin
+from sys import stdin, argv
 from Agent import Agent
 from Board import Board
 
-width = 5
-height = 5
+detailed = "-d" in argv
+
+width = 11 if detailed else 200
+height = 7 if detailed else 55
 
 board = Board(width, height)
 
-num_agents = 8
+num_agents = 14 if detailed else 1000
 
 agents = [None] * num_agents
 for i in range(0, num_agents):
@@ -18,7 +20,7 @@ for i in range(0, num_agents):
 
     board.place_on_point(agents[i], x, y)
 
-board.draw()
+board.draw(detailed=detailed)
 
 simulation_time = 60
 
@@ -31,8 +33,8 @@ for line in stdin:
     for agent in agents:
         next_position = agent.calculate_step()
         agent.board = new_board
-        agent.move_to(next_position)
+        # agent.move_to(next_position)
 
     board = new_board
-    board.draw()
+    board.draw(detailed=detailed)
     steps_complete += 1

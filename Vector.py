@@ -7,6 +7,8 @@ class Vector:
         self.x = x
         self.y = y
 
+        self._simplify()
+
         if deg is not None:
             if deg != 90 and deg != 270:
                 self.x = -1 if 90 < deg and deg < 270 else 1
@@ -14,7 +16,7 @@ class Vector:
             else:
                 self.y = 1 if deg == 90 else -1
 
-        self.normalize()
+            self.normalize()
 
 
     def _simplify(self):
