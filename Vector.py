@@ -87,7 +87,11 @@ class Vector:
         self.multiply(magnitude / self.get_magnitude())
 
 
-    def output(self):
+    def __repr__(self) -> str:
+        return f'({self.x}, {self.y})'
+
+
+    def debug(self):
         s = f'({self.x}, {self.y})'
 
         if not self.is_zero():
@@ -100,7 +104,7 @@ class Vector:
 
 # for i in range(0, 8):
 #     vector = Vector(deg = i * 45)
-#     vector.output()
+#     vector.debug()
 #     vector.rotate(45)
-#     vector.output()
+#     vector.debug()
 #     print()

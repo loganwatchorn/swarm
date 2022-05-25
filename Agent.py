@@ -17,10 +17,11 @@ class Scanner:
 
 
 class Agent:
-    def __init__(self, x, y, board, id):
+    def __init__(self, position, board, id):
         self._board = board
+        self._next_move = Vector(0, 0)
         self.id = id
-        self.position = Vector(x, y)
+        self.position = position
         self.direction = 0
         self.scanners = []
 
@@ -33,51 +34,20 @@ class Agent:
             scanner.scan()
 
 
-    def calculate_step(self):
+    def calculate_next_move(self):
         self.scan()
+        # print([scanner.reading for scanner in self.scanners])
 
-        return self.position
-
-
-    def move_to(self, position):
-        x = position[0]
-        y = position[1]
-
-        self._board.remove_from_point(self.x, self.y)
-
-        self.x = x
-        self.y = y
-        self._board.place_on_point(self, x, y)
+        self._next_move = Vector(0, 0)
 
 
-    def to_str(self, detailed=False):
-        if not detailed:
-            return "+"
+    def move(self):
+        self._board.move_item(self.position, self._next_move)
+        self.position.add(self._next_move)
 
-        num_lines = 7
-        lines = [""] * num_lines
 
-        for i in [0, 2, 4, 6]:
-            lines[i] = "+----+----+----+"
-
-        def format_reading(r):
-            s = "  " if r is None else str(r)
-            return " " + s if len(s) == 1 else s
-
-        for i in [1, 3, 5]:
-            if i == 1:
-                readings = [self.scanners[j].reading for j in [3, 2, 1]]
-            elif i == 3:
-                readings = [self.scanners[4].reading, self.id, self.scanners[0].reading]
-            elif i == 5:
-                readings = [self.scanners[j].reading for j in [5, 6, 7]]
-
-            lines[i] += ("| "
-                + format_reading(readings[0])
-                + " | "
-                + format_reading(readings[1])
-                + " | "
-                + format_reading(readings[2])
-                + " |")
-
-        return lines
+    def __repr__(self) -> str:
+        return (f'Agent #{self.id},\n'
+            + f'  position: {self.position},\n'
+            + f'  readings: '
+              + f'{str([scanner.reading for scanner in self.scanners])}')

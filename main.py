@@ -1,40 +1,44 @@
-from sys import stdin, argv
+from sys import argv, stdin
 from Agent import Agent
 from Board import Board
+from Display import Display, DisplayVariant
+from Vector import Vector
 
-detailed = "-d" in argv
 
-width = 11 if detailed else 200
-height = 7 if detailed else 55
+def get_flag(flag, default=False):
+    for arg in argv:
+        flag_str = "-" + flag
+        if arg[0:2] == flag_str:
+            return arg[2:] if len(arg) > 2 else True
 
+    return default
+
+display_variant = get_flag("d", DisplayVariant.standard)
+if display_variant == "scanners":
+    display_variant = DisplayVariant.scanners
+
+def variant(standard, scanners):
+    if display_variant == DisplayVariant.scanners:
+        return scanners
+    return standard
+
+debug = get_flag("f")
+height = get_flag("h", variant(56, 7))
+num_agents = get_flag("n", variant(1000, 14))
+width = get_flag("w", variant(211, 11))
+
+
+display = Display(display_variant, debug)
 board = Board(width, height)
-
-num_agents = 14 if detailed else 1000
-
 agents = [None] * num_agents
 for i in range(0, num_agents):
-    x = i % width
-    y = i // width
+    position = Vector(x = i % width, y = i // width)
+    agents[i] = Agent(position, board, i)
+    board.place_item(position, agents[i])
 
-    agents[i] = Agent(x, y, board, i)
 
-    board.place_on_point(agents[i], x, y)
-
-board.draw(detailed=detailed)
-
-simulation_time = 60
-
-steps_complete = 0
-step_time = 1
-
-# while (steps_complete + 1) * step_time < simulation_time:
+display.draw(board)
 for line in stdin:
-    new_board = board
-    for agent in agents:
-        next_position = agent.calculate_step()
-        agent.board = new_board
-        # agent.move_to(next_position)
-
-    board = new_board
-    board.draw(detailed=detailed)
-    steps_complete += 1
+    for agent in agents: agent.calculate_next_move()
+    for agent in agents: agent.move()
+    display.draw(board)
