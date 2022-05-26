@@ -1,4 +1,4 @@
-from Vector import Vector
+from space import GridVector as Vector
 
 class Scanner:
     def __init__(self, owner, relative_direction):
@@ -12,14 +12,14 @@ class Scanner:
 
 
     def scan(self):
-        self.reading = self.owner._board.scan(self.owner.position, self.get_direction())
+        self.reading = self.owner._space.scan(self.owner.position, self.get_direction())
 
 
 
 class Agent:
-    def __init__(self, position, board, id):
-        self._board = board
-        self._next_move = Vector(0, 0)
+    def __init__(self, position, space, id):
+        self._space = space
+        self._next_move = Vector([0, 0])
         self.id = id
         self.position = position
         self.direction = 0
@@ -38,11 +38,11 @@ class Agent:
         self.scan()
         # print([scanner.reading for scanner in self.scanners])
 
-        self._next_move = Vector(0, 0)
+        self._next_move = Vector([0, 0])
 
 
     def move(self):
-        self._board.move_item(self.position, self._next_move)
+        self._space.move_item(self.position, self._next_move)
         self.position += self._next_move
 
 

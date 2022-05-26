@@ -1,8 +1,9 @@
 from sys import argv, stdin
-from Agent import Agent
-from Board import Board
-from Display import Display, DisplayVariant
-from Vector import Vector
+
+from agents import Agent
+from space import Vector
+from space.GridSpace import GridSpace, GridVector
+from display import Display, DisplayVariant
 
 
 def get_flag(flag, default=False):
@@ -29,18 +30,18 @@ width = get_flag("w", variant(211, 11))
 
 
 display = Display(display_variant, debug)
-board = Board(width, height)
+space = GridSpace(width, height)
 agents = [None] * num_agents
 for i in range(0, num_agents):
-    position = Vector(x = i % width, y = i // width)
-    agents[i] = Agent(position, board, i)
-    board.place_item(position, agents[i])
+    position = GridVector([i % width, i // width])
+    agents[i] = Agent(position, space, i)
+    space.place_item(position, agents[i])
 
 
-display.draw(board)
+display.draw(space)
 for line in stdin:
     for i in range(0, num_agents):
         agents[i].calculate_next_move()
     for i in range(0, num_agents):
         agents[i].move()
-    display.draw(board)
+    display.draw(space)

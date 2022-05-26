@@ -1,43 +1,4 @@
-from enum import Enum
-from Vector import Vector
-
-class DisplayVariant(Enum):
-    standard = 'standard'
-    scanners = 'scanners'
-
-class Display:
-    def __new__(cls, variant, debug):
-        if variant == DisplayVariant.scanners:
-            display_class = ScannerDisplay
-        else:
-            display_class = StandardDisplay
-
-        display = super().__new__(display_class)
-        display.debug = debug
-        return display
-
-
-class StandardDisplay:
-    def draw(self, board):
-        border = "@"
-
-        print(border * (2 + board.width()))
-
-        for y in range(board.height() - 1, -1, -1):
-            line = border
-
-            for x in range(0, board.width()):
-                if board.contains_item_at(Vector(x, y)):
-                    line += "+"
-                else:
-                    line += " "
-
-            line += border
-
-            print(line)
-
-        print(border * (2 + board.width()))
-
+from space import Vector
 
 class ScannerDisplay:
     def format_scanner_reading(self, r):
@@ -77,7 +38,7 @@ class ScannerDisplay:
         return lines
 
 
-    def draw(self, board):
+    def draw(self, space):
         l_border = "@ "
         r_border = " @"
         cell_divider = " @ "
@@ -86,29 +47,29 @@ class ScannerDisplay:
 
         display_width = (len(l_border)
             + len(r_border)
-            + board.width() * cell_width
-            + (board.width() - 1) * len(cell_divider))
+            + space.width() * cell_width
+            + (space.width() - 1) * len(cell_divider))
 
         horizontal_divider = "@"
         while len(horizontal_divider) + len(r_border) <= display_width:
             horizontal_divider += r_border
 
-        for y in range(board.height() - 1, -1, -1):
+        for y in range(space.height() - 1, -1, -1):
             print(horizontal_divider)
             lines = []
             for i in range(0, cell_height):
                 lines.append(l_border)
 
-            for x in range(0, board.width()):
+            for x in range(0, space.width()):
                 if x > 0:
                     for i in range(0, len(lines)):
                         lines[i] += cell_divider
 
-                if not board.contains_item_at(Vector(x, y)):
+                if not space.point_occupied(Vector([x, y])):
                     for i in range(0, len(lines)):
                         lines[i] += " " * cell_width
                 else:
-                    agent = board._read(Vector(x, y))
+                    agent = space._read(Vector([x, y]))
                     agent_strings = self.agent_to_strings(agent)
                     for i in range(0, len(lines)):
                         lines[i] += agent_strings[i]
@@ -119,19 +80,10 @@ class ScannerDisplay:
         print(horizontal_divider)
 
         if self.debug:
-            for x in range(0, board.width()):
-                for y in range(0, board.height()):
-                    p = Vector(x, y)
-                    if board.contains_item_at(p):
+            for x in range(0, space.width()):
+                for y in range(0, space.height()):
+                    p = Vector([x, y])
+                    if space.point_occupied(p):
                         print(f'{p} contains agent')
-                        agent = board._read(p)
+                        agent = space._read(p)
                         print(agent)
-
-
-
-
-# d1 = Display(variant = DisplayVariant.standard, debug=True)
-# d1.draw_board()
-#
-# d2 = Display(DisplayVariant.scanners, False)
-# d2.draw_board()
