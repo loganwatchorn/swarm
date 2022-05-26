@@ -118,6 +118,15 @@ class ScannerDisplay:
 
         print(horizontal_divider)
 
+        if self.debug:
+            for x in range(0, board.width()):
+                for y in range(0, board.height()):
+                    p = Vector(x, y)
+                    if board.contains_item_at(p):
+                        print(f'{p} contains agent')
+                        agent = board._read(p)
+                        print(agent)
+
 
 
 

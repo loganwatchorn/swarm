@@ -43,11 +43,12 @@ class Agent:
 
     def move(self):
         self._board.move_item(self.position, self._next_move)
-        self.position.add(self._next_move)
+        self.position += self._next_move
 
 
     def __repr__(self) -> str:
-        return (f'Agent #{self.id},\n'
+        return (f'Agent id: {self.id},\n'
             + f'  position: {self.position},\n'
+            + f'  next_move: {self._next_move},\n'
             + f'  readings: '
               + f'{str([scanner.reading for scanner in self.scanners])}')

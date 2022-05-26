@@ -2,7 +2,7 @@ from math import degrees, radians, tan, atan, sin, cos, sqrt
 
 
 class Vector:
-    def __init__(self, x=0, y=0, deg=None):
+    def __init__(self, x=0, y=0, deg=None, magnitude=None):
         self._precision = 5
         self.x = x
         self.y = y
@@ -18,15 +18,19 @@ class Vector:
 
             self.normalize()
 
+        if magnitude:
+            self *= magnitude
+
+
+    def _simplify_number(self, number):
+        n = round(number, self._precision)
+        n_int = round(n)
+        return n if n != n_int else n_int
+
 
     def _simplify(self):
-        x = round(self.x, self._precision)
-        x_int = round(x)
-        self.x = x if x != x_int else x_int
-
-        y = round(self.y, self._precision)
-        y_int = round(y)
-        self.y = y if y != y_int else y_int
+        self.x = self._simplify_number(self.x)
+        self.y = self._simplify_number(self.y)
 
 
     def is_zero(self):
@@ -38,7 +42,7 @@ class Vector:
         # return sqrt(self.x ** 2 + self.y ** 2)
 
         # L_infty norm (Grid)
-        return max(abs(self.x), abs(self.y))
+        return self._simplify_number(max(abs(self.x), abs(self.y)))
 
 
     def get_angle(self):
@@ -63,15 +67,38 @@ class Vector:
         self.y *= c
         self._simplify()
 
+    def __mul__(self, other):
+        c = round(other, self._precision)
+        x = self.x * c
+        y = self.y * c
+        return Vector(x, y)
 
-    def add(self, v):
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+
+    def add(self, v, debug=False):
+        if debug:
+            print(f'self: {self}')
+            print(f'v: {v}')
+            print("add")
         self.x += v.x
         self.y += v.y
+        if debug:
+            print(f'self: {self}')
+            print("simplify")
         self._simplify()
+        if debug:
+            print(f'self: {self}')
+
+    def __add__(self, other):
+        x = self.x + other.x
+        y = self.y + other.y
+        return Vector(x, y)
 
 
     def normalize(self):
-        self.multiply(1 / self.get_magnitude())
+        self *= 1 / self.get_magnitude()
 
 
     def rotate(self, deg):
@@ -84,7 +111,7 @@ class Vector:
         self.x = cos(new_angle)
         self.y = sin(new_angle)
 
-        self.multiply(magnitude / self.get_magnitude())
+        self *= magnitude / self.get_magnitude()
 
 
     def __repr__(self) -> str:

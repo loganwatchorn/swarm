@@ -39,6 +39,8 @@ for i in range(0, num_agents):
 
 display.draw(board)
 for line in stdin:
-    for agent in agents: agent.calculate_next_move()
-    for agent in agents: agent.move()
+    for i in range(0, num_agents):
+        agents[i].calculate_next_move()
+    for i in range(0, num_agents):
+        agents[i].move()
     display.draw(board)

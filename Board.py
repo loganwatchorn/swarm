@@ -1,3 +1,5 @@
+from copy import copy
+
 from Vector import Vector
 
 
@@ -56,8 +58,7 @@ class Board(Grid):
 
 
     def move_item(self, position, step):
-        new_position = position
-        new_position.add(step)
+        new_position = copy(position) + step
 
         if not self.contains_item_at(new_position):
             self._write(new_position, self._read(position))
@@ -65,18 +66,17 @@ class Board(Grid):
 
 
     def scan(self, position, direction):
+        p = copy(position)
         step = Vector(deg = direction)
-        position.add(step)
+        p += step
 
-        distance = 0
+        distance = step.get_magnitude()
 
-        while True:
-            if (not self.contains_point(position)
-                or self.contains_item_at(position)):
-                return distance
-
-            position.add(step)
+        while (self.contains_point(p) and not self.contains_item_at(p)):
+            p += step
             distance += step.get_magnitude()
+
+        return distance
 
 
     def draw_debug(self):
